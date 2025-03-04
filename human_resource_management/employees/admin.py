@@ -1,3 +1,10 @@
 from django.contrib import admin
+from .models import Employee
 
-# Register your models here.
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ('employee_number', 'name', 'surname', 'role', 'salary', 'manager')
+    search_fields = ('name', 'surname', 'role', 'manager__name')
+    list_filter = ('role', 'manager')
+    ordering = ('employee_number',)
+
+admin.site.register(Employee, EmployeeAdmin)
