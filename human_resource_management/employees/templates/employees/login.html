@@ -2,12 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .login-header {
+            background: linear-gradient(135deg, #007bff, #00d4ff);
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            margin: -20px -20px 20px -20px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>Login</h2>
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Human Resource Management</h2>
+            <h2>Login</h2>
+        </div>
         {% if error %}
             <div class="alert alert-danger">{{ error }}</div>
         {% endif %}
