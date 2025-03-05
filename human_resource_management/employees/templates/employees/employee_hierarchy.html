@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Organization Hierarchy</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .node { cursor: pointer; }
+        .node circle { fill: steelblue; stroke: #fff; stroke-width: 3px; }
+        .node text { font-size: 12px; fill: black; }
+        .link { fill: none; stroke: #ccc; stroke-width: 2px; }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Organization Hierarchy</h2>
+    <button onclick="location.href='{% url 'employee_list' %}'" class="btn btn-primary">Back to Employee List</button>
+</div>
+<div id="tree-container"></div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    fetch("{% url 'hierarchy_data' %}")
+        .then(response => response.json())
+        .then(data => drawHierarchy(data.hierarchy));
+    function drawHierarchy(treeData) {
+        const width = window.innerWidth * 0.9;
+        const height = 600;
+        const svg = d3.select("#tree-container")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", "translate(50,50)");
+        const treeLayout = d3.tree().size([width - 100, height - 150]);
+        const root = d3.hierarchy({ name: "Company", children: treeData });
+        treeLayout(root);
+        svg.selectAll(".link")
+            .data(root.links())
+            .enter()
+            .append("line")
+            .attr("class", "link")
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
+        const node = svg.selectAll(".node")
+            .data(root.descendants())
+            .enter()
+            .append("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${d.x},${d.y})`);
+        node.append("circle").attr("r", 20);
+        node.append("text")
+            .attr("dy", 5)
+            .attr("dx", -10)
+            .text(d => d.depth === 0 ? `${d.data.name} (0)` : `${d.data.name} (${d.data.employee_number})`);
+    }
+});
+</script>
+</body>
+</html>

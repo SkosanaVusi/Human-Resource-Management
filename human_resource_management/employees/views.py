@@ -3,6 +3,8 @@ from .models import Employee
 from .forms import EmployeeForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -93,3 +95,23 @@ def delete_employee(request, pk):
         employee.delete()
         return redirect('employee_list')
     return render(request, 'employees/employee_confirm_delete.html', {'employee': employee})
+
+def build_hierarchy(manager=None):
+    employees = Employee.objects.filter(manager=manager)
+    return [
+        {
+            "id": emp.id,
+            "name": f"{emp.name} {emp.surname}",
+            "role": emp.role,
+            "children": build_hierarchy(emp),
+            "employee_number": emp.employee_number
+        }
+        for emp in employees
+    ]
+
+def hierarchy_view(request):
+    data = build_hierarchy(None)
+    return JsonResponse({"hierarchy": data})
+
+def hierarchy_page(request):
+    return render(request, 'employees/employee_hierarchy.html')
