@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Employee</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-
+    
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="{% url 'employee_list' %}">Human Resource Management</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,9 +18,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'employee_list' %}">Employee List</a>
             </li>
-            <!-- <li class="nav-item">
-                <a class="nav-link" href="{% url 'create_employee' %}">Create Employee</a>
-            </li> -->
+
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'employee_hierarchy' %}">Hierarchy</a>
             </li>
@@ -36,7 +35,74 @@
     <h1 class="text-center mb-4">{% if form.instance.pk %}Edit{% else %}Create{% endif %} Employee</h1>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="form-group">
+            <label for="id_name">Name</label>
+            <input type="text" class="form-control" name="name" id="id_name" value="{{ form.name.value|default:'' }}">
+        </div>
+        <div class="form-group">
+            <label for="id_surname">Surname</label>
+            <input type="text" class="form-control" name="surname" id="id_surname" value="{{ form.surname.value|default:'' }}">
+        </div>
+        <div class="form-group">
+            <label for="id_email">Email</label>
+            <input type="email" class="form-control" name="email" id="id_email" value="{{ form.email.value|default:'' }}">
+            {% if form.email.errors %}
+                <div class="alert alert-danger mt-2">
+                    {% for error in form.email.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="id_birth_date">Birth Date</label>
+            {{ form.birth_date }}
+        </div>
+        <div class="form-group">
+            <label for="id_gender">Gender</label>
+            <select class="form-control" name="gender" id="id_gender">
+                <option value="M" {% if form.gender.value == 'M' %}selected{% endif %}>Male</option>
+                <option value="F" {% if form.gender.value == 'F' %}selected{% endif %}>Female</option>
+                <option value="O" {% if form.gender.value == 'O' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="id_salary">Salary</label>
+            <input type="number" class="form-control" name="salary" id="id_salary" value="{{ form.salary.value|default:'' }}">
+        </div>
+        <div class="form-group">
+            <label for="id_role">Role</label>
+            <input type="text" class="form-control" name="role" id="id_role" value="{{ form.role.value|default:'' }}">
+        </div>
+        <div class="form-group">
+            <label for="id_manager">Manager</label>
+            <select class="form-control" name="manager" id="id_manager">
+                <option value="">---------</option>
+                {% for manager in form.manager.field.queryset %}
+                    <option value="{{ manager.pk }}" {% if manager.pk == form.manager.value %}selected{% endif %}>
+                        {{ manager.name }} {{ manager.surname }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="id_department">Department</label>
+            <select class="form-control" name="department" id="id_department">
+                <option value="">---------</option>
+                {% for department in form.department.field.queryset %}
+                    <option value="{{ department.pk }}" {% if department.pk == form.department.value %}selected{% endif %}>
+                        {{ department.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
         <button type="submit" class="btn btn-success btn-block">Save</button>
     </form>
     <br>
