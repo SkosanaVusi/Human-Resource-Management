@@ -2,6 +2,14 @@ from django.db import models
 from django.core.exceptions import ValidationError
 import hashlib
 
+
+class Department(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    def __str__(self):
+        return self.name
+    class Meta:
+        ordering = ['name']
+
 class Employee(models.Model):
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -18,7 +26,8 @@ class Employee(models.Model):
     role = models.CharField(max_length=100)
     manager = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subordinates')
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='O')
-    
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)  # Added here
+
     def __str__(self):
         return f"{self.name} {self.surname} - {self.role}"
 

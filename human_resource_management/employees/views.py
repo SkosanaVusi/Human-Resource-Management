@@ -34,6 +34,9 @@ def employee_list(request):
     salary_filter = request.GET.get('salary_filter', '')
     search_role = request.GET.get('search_role', '')
     search_manager = request.GET.get('search_manager', '')
+    search_department = request.GET.get('search_department', '')
+    if search_department:
+        employees = employees.filter(department__name__icontains=search_department)
 
     if search_name:
         employees = employees.filter(name__icontains=search_name)
@@ -55,6 +58,7 @@ def employee_list(request):
 
     return render(request, 'employees/employee_list.html', {
         'employees': employees,
+        'search_department': search_department,
         'search_name': search_name,
         'search_surname': search_surname,
         'search_employee_number': search_employee_number,

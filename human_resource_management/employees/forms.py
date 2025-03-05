@@ -1,6 +1,7 @@
 from django import forms
 from .models import Employee
 from django.core.exceptions import ValidationError
+from .models import Department
 
 class EmployeeForm(forms.ModelForm):
     birth_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
@@ -10,6 +11,7 @@ class EmployeeForm(forms.ModelForm):
         exclude = ['employee_number']
     
     manager = forms.ModelChoiceField(queryset=Employee.objects.all(), required=False)
+    department = forms.ModelChoiceField(queryset=Department.objects.all(), required=False)
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
