@@ -3,28 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <title>Employee List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Employees View</h1>
-    <a href="{% url 'create_employee' %}">Create New Employee</a>
-    <table>
+<div class="container mt-5">
+    <h1 class="text-center">Employees View</h1>
+    <a href="{% url 'create_employee' %}" class="btn btn-primary mb-3">Create New Employee</a>
+    <form method="get" class="mb-4">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="search_name">Search by Name:</label>
+                <input type="text" class="form-control" name="search_name" value="{{ search_name }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="search_surname">Search by Surname:</label>
+                <input type="text" class="form-control" name="search_surname" value="{{ search_surname }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="search_role">Search by Role:</label>
+                <input type="text" class="form-control" name="search_role" value="{{ search_role }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="search_manager">Search by Manager:</label>
+                <input type="text" class="form-control" name="search_manager" value="{{ search_manager }}">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="search_salary">Search by Salary:</label>
+                <input type="number" class="form-control" name="search_salary" value="{{ search_salary }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="salary_filter">Salary Comparison:</label>
+                <select class="form-control" name="salary_filter">
+                    <option value="" {% if not salary_filter %}selected{% endif %}>Is</option>
+                    <option value="greater_than" {% if salary_filter == 'greater_than' %}selected{% endif %}>Greater than</option>
+                    <option value="lower_than" {% if salary_filter == 'lower_than' %}selected{% endif %}>Lower than</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Avatar</th>
-                <th>Name</th>
-                <th>Surname</th>
-                <th>Email</th>
-                <th>Employee Number</th>
-                <th>Salary</th>
-                <th>Role</th>
-                <th>Manager</th>
+                <th><a href="?sort_by=name">Name</a></th>
+                <th><a href="?sort_by=surname">Surname</a></th>
+                <th><a href="?sort_by=email">Email</a></th>
+                <th><a href="?sort_by=employee_number">Employee Number</a></th>
+                <th><a href="?sort_by=salary">Salary</a></th>
+                <th><a href="?sort_by=role">Role</a></th>
+                <th><a href="?sort_by=manager">Manager</a></th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for employee in employees %}
             <tr>
-                <td><img src="{{ employee.get_gravatar_url }}" alt="Gravatar" width="50" height="50"></td>
+                <td><img src="{{ employee.get_gravatar_url }}" alt="Gravatar" class="img-fluid" width="50" height="50"></td>
                 <td>{{ employee.name }}</td>
                 <td>{{ employee.surname }}</td>
                 <td>{{ employee.email }}</td>
@@ -33,12 +70,16 @@
                 <td>{{ employee.role }}</td>
                 <td>{% if employee.manager %}{{ employee.manager.name }}{% else %}None{% endif %}</td>
                 <td>
-                    <a href="{% url 'edit_employee' employee.pk %}">Edit</a>
-                    <a href="{% url 'delete_employee' employee.pk %}">Delete</a>
+                    <a href="{% url 'edit_employee' employee.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_employee' employee.pk %}" class="btn btn-danger btn-sm">Delete</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
