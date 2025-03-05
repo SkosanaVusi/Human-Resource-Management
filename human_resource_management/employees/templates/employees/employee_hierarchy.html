@@ -2,22 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organization Hierarchy</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         .node { cursor: pointer; }
-        .node circle { fill: steelblue; stroke: #fff; stroke-width: 3px; }
+        .node circle { fill: steelblue; stroke: #fff; stroke-width: 3px; transition: fill 0.3s ease; }
         .node text { font-size: 12px; fill: black; }
         .link { fill: none; stroke: #ccc; stroke-width: 2px; }
+        .highlight circle { fill: red !important; }
+        .search-dropdown { position: absolute; width: 100%; background: white; border: 1px solid #ddd; display: none; max-height: 200px; overflow-y: auto; z-index: 1000; }
+        .search-dropdown div { padding: 10px; cursor: pointer; }
+        .search-dropdown div:hover { background: #f0f0f0; }
+        .tooltip { position: absolute; background: #333; color: #fff; padding: 5px; border-radius: 3px; display: none; }
     </style>
 </head>
 <body>
-
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="{% url 'employee_list' %}">Human Resource Management</a>
+    <a class="navbar-brand" href="{% url 'employee_list' %}">Employee Management</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -29,9 +33,6 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'create_employee' %}">Create Employee</a>
             </li>
-            <!-- <li class="nav-item">
-                <a class="nav-link" href="{% url 'employee_hierarchy' %}">Hierarchy</a>
-            </li> -->
         </ul>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
@@ -39,31 +40,59 @@
             </li>
         </ul>
     </div>
-</nav>    
-
-
+</nav>
 <div class="container mt-4">
     <h2>Organization Hierarchy</h2>
+    <div class="position-relative">
+        <input type="text" id="search" class="form-control mb-3" placeholder="Search for an employee..." autocomplete="off">
+        <div id="search-results" class="search-dropdown"></div>
+    </div>
     <button onclick="location.href='{% url 'employee_list' %}'" class="btn btn-primary">Back to Employee List</button>
 </div>
 <div id="tree-container"></div>
+<div id="tooltip" class="tooltip"></div>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+    let employeeData = [];
+    let nodeMap = {};
+    let zoom = d3.zoom().on("zoom", function(event) { svg.attr("transform", event.transform); });
+
     fetch("{% url 'hierarchy_data' %}")
         .then(response => response.json())
-        .then(data => drawHierarchy(data.hierarchy));
+        .then(data => {
+            employeeData = flattenHierarchy(data.hierarchy);
+            drawHierarchy(data.hierarchy);
+        });
+
+    function flattenHierarchy(treeData) {
+        let flatData = [];
+        function traverse(node) {
+            if (!node) return;
+            flatData.push(node);
+            if (node.children) node.children.forEach(traverse);
+        }
+        treeData.forEach(traverse);
+        return flatData;
+    }
+
     function drawHierarchy(treeData) {
         const width = window.innerWidth * 0.9;
         const height = 600;
+
+        d3.select("#tree-container").html("");
         const svg = d3.select("#tree-container")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
+            .call(zoom)
             .append("g")
             .attr("transform", "translate(50,50)");
+
         const treeLayout = d3.tree().size([width - 100, height - 150]);
+
         const root = d3.hierarchy({ name: "Company", children: treeData });
         treeLayout(root);
+
         svg.selectAll(".link")
             .data(root.links())
             .enter()
@@ -73,18 +102,92 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("y1", d => d.source.y)
             .attr("x2", d => d.target.x)
             .attr("y2", d => d.target.y);
+
         const node = svg.selectAll(".node")
             .data(root.descendants())
             .enter()
             .append("g")
             .attr("class", "node")
-            .attr("transform", d => `translate(${d.x},${d.y})`);
-        node.append("circle").attr("r", 20);
+            .attr("transform", d => `translate(${d.x},${d.y})`)
+            .on("click", handleClick)
+            .on("mouseover", handleMouseOver)
+            .on("mouseout", handleMouseOut);
+
+        node.append("circle")
+            .attr("r", 20)
+            .attr("class", d => d.data.role === "Manager" ? "manager-node" : "employee-node");
+
         node.append("text")
             .attr("dy", 5)
             .attr("dx", -10)
+            .text(d => d.data.name)
             .text(d => d.depth === 0 ? `${d.data.name} (0)` : `${d.data.name} (${d.data.employee_number})`);
+
+        node.each(d => { nodeMap[d.data.id] = d; });
+
+        function handleClick(d) {
+            const empId = d.data.id;
+            if (empId) {
+                if (confirm(`Edit or delete ${d.data.name}?`)) {
+                    window.location.href = "{% url 'edit_employee' 0 %}".replace("0", empId);
+                }
+            }
+        }
+
+        function handleMouseOver(d) {
+            d3.select(this).select("circle").transition().duration(200).attr("r", 25);
+            const tooltip = d3.select("#tooltip");
+            tooltip.style("display", "block")
+                .style("left", `${d.x + 20}px`)
+                .style("top", `${d.y - 10}px`)
+                .html(`Role: ${d.data.role}<br>Name: ${d.data.name}`);
+        }
+
+        function handleMouseOut(d) {
+            d3.select(this).select("circle").transition().duration(200).attr("r", 20);
+            d3.select("#tooltip").style("display", "none");
+        }
     }
+
+    document.getElementById("search").addEventListener("input", function () {
+        const searchText = this.value.toLowerCase();
+        const resultsBox = document.getElementById("search-results");
+        resultsBox.innerHTML = "";
+        if (searchText.length === 0) {
+            resultsBox.style.display = "none";
+            return;
+        }
+
+        const results = employeeData.filter(emp => emp.name.toLowerCase().includes(searchText));
+        if (results.length === 0) {
+            resultsBox.style.display = "none";
+            return;
+        }
+
+        results.forEach(emp => {
+            const div = document.createElement("div");
+            div.innerText = emp.name;
+            div.onclick = () => {
+                window.location.href = "{% url 'edit_employee' 0 %}".replace("0", emp.id);
+            };
+            resultsBox.appendChild(div);
+        });
+
+        resultsBox.style.display = "block";
+    });
+
+    function highlightNode(empId) {
+        d3.selectAll(".node").classed("highlight", false);
+        if (nodeMap[empId]) {
+            d3.select(nodeMap[empId].node()).classed("highlight", true);
+        }
+    }
+
+    document.addEventListener("click", function (event) {
+        if (!event.target.closest("#search") && !event.target.closest("#search-results")) {
+            document.getElementById("search-results").style.display = "none";
+        }
+    });
 });
 </script>
 </body>
