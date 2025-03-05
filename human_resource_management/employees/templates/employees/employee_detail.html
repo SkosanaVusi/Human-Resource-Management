@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ employee.name }} {{ employee.surname }} - Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>{{ employee.name }} {{ employee.surname }}</h1>
+    <img src="{{ employee.get_gravatar_url }}" alt="Gravatar" width="150" height="150">
+    <table class="table">
+        <tr><th>Name</th><td>{{ employee.name }}</td></tr>
+        <tr><th>Surname</th><td>{{ employee.surname }}</td></tr>
+        <tr><th>Email</th><td>{{ employee.email }}</td></tr>
+        <tr><th>Birth Date</th><td>{{ employee.birth_date }}</td></tr>
+        <tr><th>Employee Number</th><td>{{ employee.employee_number }}</td></tr>
+        <tr><th>Salary</th><td>{{ employee.salary }}</td></tr>
+        <tr><th>Role</th><td>{{ employee.role }}</td></tr>
+        <tr><th>Manager</th><td>{% if employee.manager %}{{ employee.manager.name }}{% else %}None{% endif %}</td></tr>
+        <tr><th>Gender</th><td>{{ employee.get_gender_display }}</td></tr>
+    </table>
+    <a href="{% url 'edit_employee' employee.pk %}" class="btn btn-warning">Edit</a>
+    <a href="{% url 'delete_employee' employee.pk %}" class="btn btn-danger">Delete</a>
+    <a href="{% url 'employee_list' %}" class="btn btn-primary">Back to Employee List</a>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

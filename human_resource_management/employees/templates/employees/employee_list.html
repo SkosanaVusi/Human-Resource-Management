@@ -63,7 +63,7 @@
             {% for employee in employees %}
             <tr>
                 <td><img src="{{ employee.get_gravatar_url }}" alt="Gravatar" class="img-fluid" width="50" height="50"></td>
-                <td>{{ employee.name }}</td>
+                <td><a href="{% url 'employee_detail' employee.pk %}">{{ employee.name }}</a></td>
                 <td>{{ employee.surname }}</td>
                 <td>{{ employee.email }}</td>
                 <td>{{ employee.employee_number }}</td>

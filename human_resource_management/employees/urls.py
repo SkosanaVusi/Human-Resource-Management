@@ -10,4 +10,5 @@ urlpatterns = [
     path('delete/<int:pk>/', views.delete_employee, name='delete_employee'),
     path('hierarchy/', views.hierarchy_page, name='employee_hierarchy'),  
     path('api/hierarchy/', views.hierarchy_view, name='hierarchy_data'),  
+    path('detail/<int:pk>/', views.employee_detail, name='employee_detail'),
 ]
