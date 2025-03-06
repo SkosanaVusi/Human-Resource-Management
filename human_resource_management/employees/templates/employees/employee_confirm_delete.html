@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirm Delete</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="{% url 'employee_list' %}">Human Resource Management</a>
+    <a class="navbar-brand" href="{% url 'employee_list' %}">Employee Management</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -31,10 +31,13 @@
         </ul>
     </div>
 </nav>
-
 <div class="container mt-5">
     <h1 class="text-center">Are you sure you want to delete this employee?</h1>
-    <h3>{{ employee.name }} {{ employee.surname }}</h3>
+    <div class="text-center mb-4">
+        <h3 class="display-6 font-weight-bold" style="background-color: #f8d7da; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            {{ employee.name }} {{ employee.surname }}
+        </h3>
+    </div>
     <form method="post">
         {% csrf_token %}
         <button type="submit" class="btn btn-danger btn-lg btn-block">Yes, Delete</button>
