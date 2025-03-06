@@ -124,3 +124,12 @@ def hierarchy_page(request):
 def employee_detail(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     return render(request, 'employees/employee_detail.html', {'employee': employee})
+
+@login_required
+def bulk_delete_employees(request):
+    if request.method == 'POST':
+        employee_ids = request.POST.getlist('employee_ids')
+        if employee_ids:
+            Employee.objects.filter(id__in=employee_ids).delete()
+        return redirect('employee_list')
+    return redirect('employee_list')

@@ -18,6 +18,9 @@
             white-space: nowrap; /* Prevent text wrapping */
             min-width: 200px; /* Minimum width to fit buttons */
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -51,6 +54,8 @@
     <h1 class="text-center">Employees View</h1>
     <a href="{% url 'create_employee' %}" class="btn btn-primary mb-3">Create New Employee</a>
     <a href="{% url 'employee_hierarchy' %}" class="btn btn-info mb-3">View Hierarchy</a>
+    <!-- <button type="submit" form="bulk-delete-form" id="delete-selected-btn" class="btn btn-danger mb-3 hidden" onclick="return confirm('Are you sure you want to delete the selected employees?')">Delete Selected</button> -->
+
     <form method="get" class="mb-4">
         <div class="form-row">
             <div class="form-group col-md-3">
@@ -89,10 +94,13 @@
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" form="bulk-delete-form" id="delete-selected-btn" class="btn btn-danger hidden" onclick="return confirm('Are you sure you want to delete the selected employees?')">Delete Selected</button>
+
     </form>
     <table class="table table-bordered">
         <thead>
             <tr>
+                <th><input type="checkbox" id="select-all"></th> <!-- checkbox for selecting all -->
                 <th>Avatar</th>
                 <th><a href="?sort_by=name">Name</a></th>
                 <th><a href="?sort_by=surname">Surname</a></th>
@@ -105,32 +113,67 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
-            {% for employee in employees %}
-            <tr>
-                <td><img src="{{ employee.get_gravatar_url }}" alt="Gravatar" class="img-fluid" width="50" height="50"></td>
-                <td><a href="{% url 'employee_detail' employee.pk %}">{{ employee.name }}</a></td>
-                <td>{{ employee.surname }}</td>
-                <td>{{ employee.email }}</td>
-                <td>{{ employee.employee_number }}</td>
-                <td>{{ employee.salary }}</td>
-                <td>{{ employee.role }}</td>
-                <td>{% if employee.manager %}{{ employee.manager.name }}{% else %}None{% endif %}</td>
-                <td>{% if employee.department %}{{ employee.department.name }}{% else %}None{% endif %}</td>
-                <td class="actions-cell">
-                    <div class="actions-btn-group">
-                        <a href="{% url 'edit_employee' employee.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="{% url 'delete_employee' employee.pk %}" class="btn btn-danger btn-sm">Delete</a>
-                        <a href="{% url 'employee_detail' employee.pk %}" class="btn btn-success btn-sm">View</a>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
+        <form id="bulk-delete-form" method="post" action="{% url 'bulk_delete_employees' %}">
+            {% csrf_token %}
+            <tbody>
+                {% for employee in employees %}
+                <tr>
+                    <td><input type="checkbox" name="employee_ids" value="{{ employee.id }}"></td> <!-- checkbox for each employee -->
+                    <td><img src="{{ employee.get_gravatar_url }}" alt="Gravatar" class="img-fluid" width="50" height="50"></td>
+                    <td><a href="{% url 'employee_detail' employee.pk %}">{{ employee.name }}</a></td>
+                    <td>{{ employee.surname }}</td>
+                    <td>{{ employee.email }}</td>
+                    <td>{{ employee.employee_number }}</td>
+                    <td>{{ employee.salary }}</td>
+                    <td>{{ employee.role }}</td>
+                    <td>{% if employee.manager %}{{ employee.manager.name }}{% else %}None{% endif %}</td>
+                    <td>{% if employee.department %}{{ employee.department.name }}{% else %}None{% endif %}</td>
+                    <td class="actions-cell">
+                        <div class="actions-btn-group">
+                            <a href="{% url 'edit_employee' employee.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'delete_employee' employee.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                            <a href="{% url 'employee_detail' employee.pk %}" class="btn btn-success btn-sm">View</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </form>
     </table>
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Existing script for select-all
+    document.getElementById('select-all').addEventListener('change', function() {
+        let checkboxes = document.querySelectorAll('input[name="employee_ids"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        // Trigger updateButtonVisibility after select-all change
+        updateButtonVisibility();
+    });
+
+    // Added function to update button visibility
+    function updateButtonVisibility() {
+        let checkboxes = document.querySelectorAll('input[name="employee_ids"]');
+        let deleteButton = document.getElementById('delete-selected-btn');
+        let isAnyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        if (isAnyChecked) {
+            deleteButton.classList.remove('hidden');
+        } else {
+            deleteButton.classList.add('hidden');
+        }
+    }
+
+    // Add event listeners to individual checkboxes
+    document.querySelectorAll('input[name="employee_ids"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateButtonVisibility);
+    });
+
+    // Initial call to set button state
+    updateButtonVisibility();
+</script>
 </body>
 </html>
