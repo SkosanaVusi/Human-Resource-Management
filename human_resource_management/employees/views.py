@@ -4,6 +4,7 @@ from .forms import EmployeeForm, NoteForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.contrib import messages
 
 
 def login_view(request):
@@ -137,6 +138,7 @@ def employee_detail(request, pk):
             note = note_form.save(commit=False)
             note.employee = employee
             note.save()
+            messages.success(request, "Note added successfully.")
             return redirect('employee_detail', pk=pk)
     else:
         note_form = NoteForm()
@@ -160,6 +162,9 @@ def bulk_delete_employees(request):
 def toggle_employee_status(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
     if request.method == 'POST':
+        old_status = "active" if employee.is_active else "inactive"
         employee.is_active = not employee.is_active
+        new_status = "active" if employee.is_active else "inactive"
         employee.save()
+        messages.success(request, f"Employee status changed from {old_status} to {new_status}.")  # success message
     return redirect('employee_detail', pk=pk)
