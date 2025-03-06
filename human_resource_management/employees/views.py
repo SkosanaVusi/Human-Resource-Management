@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Employee
+from .models import Employee, Note
 from .forms import EmployeeForm, NoteForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -168,3 +168,12 @@ def toggle_employee_status(request, pk):
         employee.save()
         messages.success(request, f"Employee status changed from {old_status} to {new_status}.")  # success message
     return redirect('employee_detail', pk=pk)
+
+
+@login_required
+def delete_note(request, note_id):
+    note = get_object_or_404(Note, id=note_id)
+    employee_id = note.employee.id
+    note.delete()
+    messages.success(request, "Note deleted successfully.")
+    return redirect('employee_detail', pk=employee_id)
