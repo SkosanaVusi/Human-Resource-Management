@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const div = document.createElement("div");
             div.innerText = emp.name;
             div.onclick = () => {
-                window.location.href = "{% url 'edit_employee' 0 %}".replace("0", emp.id);
+                window.location.href = "{% url 'employee_detail' 0 %}".replace("0", emp.id);
             };
             resultsBox.appendChild(div);
         });
