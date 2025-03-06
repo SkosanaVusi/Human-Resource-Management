@@ -35,9 +35,15 @@ def employee_list(request):
     search_role = request.GET.get('search_role', '')
     search_manager = request.GET.get('search_manager', '')
     search_department = request.GET.get('search_department', '')
+    status_filter = request.GET.get('status_filter', 'active')  
+    
+    if status_filter == 'active':
+        employees = employees.filter(is_active=True)  
+    elif status_filter == 'inactive':
+        employees = employees.filter(is_active=False)
+
     if search_department:
         employees = employees.filter(department__name__icontains=search_department)
-
     if search_name:
         employees = employees.filter(name__icontains=search_name)
     if search_surname:
@@ -67,6 +73,8 @@ def employee_list(request):
         'search_role': search_role,
         'search_manager': search_manager,
         'sort_by': sort_by,
+        'status_filter': status_filter,  
+
     })
 
 @login_required
@@ -133,3 +141,12 @@ def bulk_delete_employees(request):
             Employee.objects.filter(id__in=employee_ids).delete()
         return redirect('employee_list')
     return redirect('employee_list')
+
+# New view for toggling employee status
+@login_required
+def toggle_employee_status(request, pk):
+    employee = get_object_or_404(Employee, pk=pk)
+    if request.method == 'POST':
+        employee.is_active = not employee.is_active
+        employee.save()
+    return redirect('employee_detail', pk=pk)

@@ -12,5 +12,5 @@ urlpatterns = [
     path('api/hierarchy/', views.hierarchy_view, name='hierarchy_data'),  
     path('detail/<int:pk>/', views.employee_detail, name='employee_detail'),
     path('bulk-delete/', views.bulk_delete_employees, name='bulk_delete_employees'), 
-
+    path('toggle-status/<int:pk>/', views.toggle_employee_status, name='toggle_employee_status'),  
 ]

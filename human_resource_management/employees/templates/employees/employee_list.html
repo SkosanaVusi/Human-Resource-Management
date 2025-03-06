@@ -92,6 +92,14 @@
                 <label for="search_department">Search by Department:</label>
                 <input type="text" class="form-control" name="search_department" value="{{ search_department }}">
             </div>
+            <div class="form-group col-md-3">
+                <label for="status_filter">Status:</label>
+                <select class="form-control" name="status_filter">
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                </select>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">Filter</button>
         <button type="submit" form="bulk-delete-form" id="delete-selected-btn" class="btn btn-danger hidden" onclick="return confirm('Are you sure you want to delete the selected employees?')">Delete Selected</button>
@@ -110,6 +118,7 @@
                 <th><a href="?sort_by=role">Role</a></th>
                 <th><a href="?sort_by=manager">Manager</a></th>
                 <th><a href="?sort_by=department__name">Department</a></th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -128,6 +137,8 @@
                     <td>{{ employee.role }}</td>
                     <td>{% if employee.manager %}{{ employee.manager.name }}{% else %}None{% endif %}</td>
                     <td>{% if employee.department %}{{ employee.department.name }}{% else %}None{% endif %}</td>
+                    <td>{% if employee.is_active %}Active{% else %}Inactive{% endif %}</td> <!-- Status column -->
+
                     <td class="actions-cell">
                         <div class="actions-btn-group">
                             <a href="{% url 'edit_employee' employee.pk %}" class="btn btn-warning btn-sm">Edit</a>

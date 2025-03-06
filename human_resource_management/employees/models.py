@@ -27,6 +27,7 @@ class Employee(models.Model):
     manager = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subordinates')
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='O')
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)  # Added here
+    is_active = models.BooleanField(default=True) 
 
     def __str__(self):
         return f"{self.name} {self.surname} - {self.role}"

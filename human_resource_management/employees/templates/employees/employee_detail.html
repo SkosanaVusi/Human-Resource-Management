@@ -153,6 +153,12 @@
     <div class="mt-4 text-center">
         <a href="{% url 'edit_employee' employee.pk %}" class="btn btn-warning">Edit</a>
         <a href="{% url 'delete_employee' employee.pk %}" class="btn btn-danger">Delete</a>
+        <form method="post" action="{% url 'toggle_employee_status' employee.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn {% if employee.is_active %}btn-secondary{% else %}btn-success{% endif %}">
+                {% if employee.is_active %}Deactivate{% else %}Activate{% endif %}
+            </button>
+        </form>
         <a href="{% url 'employee_list' %}" class="btn btn-primary">Back to Employee List</a>
     </div>
 </div>
