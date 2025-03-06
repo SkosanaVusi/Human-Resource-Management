@@ -37,16 +37,13 @@ class Employee(models.Model):
             raise ValidationError("An employee cannot be their own manager.")
     
     def save(self, *args, **kwargs):
+        # If the employee doesn't have a number yet, assign a unique one
         if not self.employee_number:
-            if self.manager is None:
-                self.employee_number = 1
+            max_employee_number = Employee.objects.aggregate(models.Max('employee_number'))['employee_number__max']
+            if max_employee_number is None:
+                self.employee_number = 1  # First employee gets number 1
             else:
-                manager_employee_number = self.manager.employee_number
-                max_employee_number = Employee.objects.filter(employee_number__gt=manager_employee_number).aggregate(models.Max('employee_number'))['employee_number__max']
-                if max_employee_number is None:
-                    self.employee_number = manager_employee_number + 1
-                else:
-                    self.employee_number = max(manager_employee_number + 1, max_employee_number + 1)
+                self.employee_number = max_employee_number + 1  # Increment the highest existing number
         super().save(*args, **kwargs)
 
     def get_gravatar_url(self):
