@@ -64,6 +64,23 @@
                 margin-bottom: 10px;
             }
         }
+        
+        .notes-section {
+            margin-top: 20px;
+        }
+
+        .note-item {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .note-date {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -160,6 +177,24 @@
             </button>
         </form>
         <a href="{% url 'employee_list' %}" class="btn btn-primary">Back to Employee List</a>
+    </div>
+    <div class="mt-4 notes-section">
+        <h3>Notes</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ note_form.as_p }}
+            <button type="submit" class="btn btn-primary">Add Note</button>
+        </form>
+        <div class="mt-3">
+            {% for note in notes %}
+            <div class="note-item">
+                <p>{{ note.content }}</p>
+                <p class="note-date">Added on {{ note.created_at }}</p>
+            </div>
+            {% empty %}
+            <p>No notes available.</p>
+            {% endfor %}
+        </div>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

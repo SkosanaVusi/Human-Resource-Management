@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Employee
-from .forms import EmployeeForm
+from .forms import EmployeeForm, NoteForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -131,7 +131,20 @@ def hierarchy_page(request):
 @login_required
 def employee_detail(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
-    return render(request, 'employees/employee_detail.html', {'employee': employee})
+    if request.method == 'POST':
+        note_form = NoteForm(request.POST)
+        if note_form.is_valid():
+            note = note_form.save(commit=False)
+            note.employee = employee
+            note.save()
+            return redirect('employee_detail', pk=pk)
+    else:
+        note_form = NoteForm()
+    return render(request, 'employees/employee_detail.html', {
+        'employee': employee,
+        'note_form': note_form,
+        'notes': employee.notes.order_by('-created_at'),
+    })
 
 @login_required
 def bulk_delete_employees(request):
