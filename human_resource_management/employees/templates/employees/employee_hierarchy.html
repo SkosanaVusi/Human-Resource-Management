@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .append("g")
             .attr("class", "node")
             .attr("transform", d => `translate(${d.x},${d.y})`)
-            .on("click", handleClick)
+            .on("click", (event, d) => handleClick(event, d))  // Updated to ES6 arrow function with event
             .on("mouseover", handleMouseOver)
             .on("mouseout", handleMouseOut);
 
@@ -125,12 +125,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         node.each(d => { nodeMap[d.data.id] = d; });
 
-        function handleClick(d) {
+        function handleClick(event, d) {
+            console.log("Node clicked:", d.data);  // Debug: Log the node data
             const empId = d.data.id;
             if (empId) {
-                if (confirm(`Edit or delete ${d.data.name}?`)) {
-                    window.location.href = "{% url 'edit_employee' 0 %}".replace("0", empId);
-                }
+                const url = "{% url 'employee_detail' 0 %}".replace("0", empId);
+                console.log("Redirecting to:", url);  // Debug: Log the URL
+                window.location.href = url;
+            } else {
+                console.error("No empId found for node:", d.data);  // Debug: Log if empId is missing
             }
         }
 
