@@ -2,13 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ employee.name }} {{ employee.surname }} - Details</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f7fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .employee-card {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        .employee-header {
+            background: linear-gradient(135deg, #007bff, #00d4ff);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+            margin: -20px -20px 20px -20px;
+        }
+        .employee-avatar {
+            border: 5px solid white;
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-top: -75px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .info-table th {
+            background-color: #e9ecef;
+            width: 30%;
+            font-weight: 600;
+            color: #495057;
+        }
+        .info-table td {
+            color: #212529;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        @media (max-width: 768px) {
+            .employee-card {
+                margin: 20px;
+            }
+            .employee-avatar {
+                width: 100px;
+                height: 100px;
+                margin-top: -50px;
+            }
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="{% url 'employee_list' %}">Human Resource Management</a>
+    <a class="navbar-brand" href="{% url 'employee_list' %}">Employee Management</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -31,24 +91,70 @@
         </ul>
     </div>
 </nav>
-
-<div class="container mt-5">
-    <h1>{{ employee.name }} {{ employee.surname }}</h1>
-    <img src="{{ employee.get_gravatar_url }}" alt="Gravatar" width="150" height="150">
-    <table class="table">
-        <tr><th>Name</th><td>{{ employee.name }}</td></tr>
-        <tr><th>Surname</th><td>{{ employee.surname }}</td></tr>
-        <tr><th>Email</th><td>{{ employee.email }}</td></tr>
-        <tr><th>Birth Date</th><td>{{ employee.birth_date }}</td></tr>
-        <tr><th>Employee Number</th><td>{{ employee.employee_number }}</td></tr>
-        <tr><th>Salary</th><td>{{ employee.salary }}</td></tr>
-        <tr><th>Role</th><td>{{ employee.role }}</td></tr>
-        <tr><th>Manager</th><td>{% if employee.manager %}{{ employee.manager.name }}{% else %}None{% endif %}</td></tr>
-        <tr><th>Gender</th><td>{{ employee.get_gender_display }}</td></tr>
-    </table>
-    <a href="{% url 'edit_employee' employee.pk %}" class="btn btn-warning">Edit</a>
-    <a href="{% url 'delete_employee' employee.pk %}" class="btn btn-danger">Delete</a>
-    <a href="{% url 'employee_list' %}" class="btn btn-primary">Back to Employee List</a>
+<div class="employee-card">
+    <div class="employee-header">
+        <h1>{{ employee.name }} {{ employee.surname }}</h1>
+    </div>
+    <div class="text-center">
+        <img src="{{ employee.get_gravatar_url }}" alt="Gravatar" class="employee-avatar">
+    </div>
+    <div class="mt-4">
+        <table class="table info-table">
+            <tr>
+                <th>Name</th>
+                <td>{{ employee.name }}</td>
+            </tr>
+            <tr>
+                <th>Surname</th>
+                <td>{{ employee.surname }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ employee.email }}</td>
+            </tr>
+            <tr>
+                <th>Birth Date</th>
+                <td>{{ employee.birth_date }}</td>
+            </tr>
+            <tr>
+                <th>Employee Number</th>
+                <td>{{ employee.employee_number }}</td>
+            </tr>
+            <tr>
+                <th>Salary</th>
+                <td>R {{ employee.salary }}</td>
+            </tr>
+            <tr>
+                <th>Role</th>
+                <td>{{ employee.role }}</td>
+            </tr>
+            <tr>
+                <th>Manager</th>
+                <td>
+                    {% if employee.manager %}
+                        {{ employee.manager.name }} {{ employee.manager.surname }}
+                    {% else %}
+                        None
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Department</th>
+                <td>
+                    {% if employee.department %}
+                        {{ employee.department.name }}
+                    {% else %}
+                        None
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="mt-4 text-center">
+        <a href="{% url 'edit_employee' employee.pk %}" class="btn btn-warning">Edit</a>
+        <a href="{% url 'delete_employee' employee.pk %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'employee_list' %}" class="btn btn-primary">Back to Employee List</a>
+    </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
