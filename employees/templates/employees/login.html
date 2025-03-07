@@ -31,7 +31,7 @@
             <h2>Login</h2>
         </div>
         {% if error %}
-            <div class="alert alert-danger">{{ error }}</div>
+            <div class="alert alert-danger">{{ error }}</div>  <!-- Display login error -->
         {% endif %}
         <form method="post">
             {% csrf_token %}

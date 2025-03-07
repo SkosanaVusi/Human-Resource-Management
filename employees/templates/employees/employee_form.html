@@ -35,6 +35,7 @@
     <h1 class="text-center mb-4">{% if form.instance.pk %}Edit{% else %}Create{% endif %} Employee</h1>
     <form method="post">
         {% csrf_token %}
+         <!-- Form fields -->
         {% if form.non_field_errors %}
             <div class="alert alert-danger">
                 {% for error in form.non_field_errors %}

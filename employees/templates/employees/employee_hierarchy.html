@@ -20,6 +20,7 @@
     </style>
 </head>
 <body>
+     <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="{% url 'employee_list' %}">Employee Management</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +46,7 @@
     <h2>Organization Hierarchy</h2>
     <div class="position-relative">
         <input type="text" id="search" class="form-control mb-3" placeholder="Search for an employee..." autocomplete="off">
-        <div id="search-results" class="search-dropdown"></div>
+        <div id="search-results" class="search-dropdown"></div> <!-- Search dropdown -->
     </div>
     <button onclick="location.href='{% url 'employee_list' %}'" class="btn btn-primary">Back to Employee List</button>
 </div>

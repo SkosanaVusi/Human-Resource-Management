@@ -10,7 +10,7 @@ admin.site.register(Department, DepartmentAdmin)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('employee_number', 'name', 'surname', 'role', 'salary', 'manager')
     search_fields = ('name', 'surname', 'role', 'manager__name')
-    list_filter = ('role', 'manager')
+    list_filter = ('role', 'manager') # Filter options
     ordering = ('employee_number',)
 
 admin.site.register(Employee, EmployeeAdmin)
