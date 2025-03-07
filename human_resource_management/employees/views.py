@@ -36,7 +36,13 @@ def employee_list(request):
     search_role = request.GET.get('search_role', '')
     search_manager = request.GET.get('search_manager', '')
     search_department = request.GET.get('search_department', '')
-    status_filter = request.GET.get('status_filter', 'active')  
+
+    # Use session value if no status_filter in GET params, otherwise update session
+    if 'status_filter' in request.GET:
+        status_filter = request.GET.get('status_filter', 'active')
+        request.session['status_filter'] = status_filter  # Store in session
+    else:
+        status_filter = request.session.get('status_filter', 'active')  # Retrieve from session  
     
     if status_filter == 'active':
         employees = employees.filter(is_active=True)  
