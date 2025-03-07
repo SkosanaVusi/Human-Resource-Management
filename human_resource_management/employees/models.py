@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 import hashlib
-
+import base64
 
 class Department(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -27,7 +27,9 @@ class Employee(models.Model):
     manager = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subordinates')
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default='O')
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)  # Added here
-    is_active = models.BooleanField(default=True) 
+    is_active = models.BooleanField(default=True)
+    profile_picture = models.BinaryField(null=True, blank=True)  # Stores image as binary data
+
 
     def __str__(self):
         return f"{self.name} {self.surname} - {self.role}"
@@ -38,6 +40,10 @@ class Employee(models.Model):
     
     def save(self, *args, **kwargs):
         # If the employee doesn't have a number yet, assign a unique one
+        if self.pk:
+            old_instance = Employee.objects.get(pk=self.pk)
+            if old_instance.email != self.email:
+                self.profile_picture = None
         if not self.employee_number:
             max_employee_number = Employee.objects.aggregate(models.Max('employee_number'))['employee_number__max']
             if max_employee_number is None:
@@ -46,7 +52,10 @@ class Employee(models.Model):
                 self.employee_number = max_employee_number + 1  # Increment the highest existing number
         super().save(*args, **kwargs)
 
-    def get_gravatar_url(self):
+    def get_profile_picture_url(self):
+        if self.profile_picture:
+            image_data = base64.b64encode(self.profile_picture).decode('utf-8')
+            return f"data:image/jpeg;base64,{image_data}"
         email = self.email.strip().lower()
         gravatar_hash = hashlib.sha256(email.encode('utf-8')).hexdigest()
         return f"https://www.gravatar.com/avatar/{gravatar_hash}"

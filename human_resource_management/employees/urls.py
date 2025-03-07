@@ -14,5 +14,7 @@ urlpatterns = [
     path('bulk-delete/', views.bulk_delete_employees, name='bulk_delete_employees'), 
     path('toggle-status/<int:pk>/', views.toggle_employee_status, name='toggle_employee_status'),  
     path('note/delete/<int:note_id>/', views.delete_note, name='delete_note'),
+    path('detail/<int:pk>/upload/', views.upload_profile_picture, name='upload_profile_picture'),
+
 
 ]

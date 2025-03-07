@@ -7,12 +7,25 @@ class EmployeeForm(forms.ModelForm):
     birth_date = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
+    profile_picture = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+
     class Meta:
         model = Employee
         exclude = ['employee_number']
     
     manager = forms.ModelChoiceField(queryset=Employee.objects.all(), required=False)
     department = forms.ModelChoiceField(queryset=Department.objects.all(), required=False)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        profile_picture = self.cleaned_data.get('profile_picture')
+        if profile_picture:
+            instance.profile_picture = profile_picture.read()
+        elif 'profile_picture' in self.changed_data and not profile_picture:
+            instance.profile_picture = None
+        if commit:
+            instance.save()
+        return instance
 
     def clean_email(self):
         email = self.cleaned_data.get('email')

@@ -21,6 +21,14 @@
         .hidden {
             display: none;
         }
+
+        .list-avatar {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 60%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -128,7 +136,7 @@
                 {% for employee in employees %}
                 <tr>
                     <td><input type="checkbox" name="employee_ids" value="{{ employee.id }}"></td> <!-- checkbox for each employee -->
-                    <td><img src="{{ employee.get_gravatar_url }}" alt="Gravatar" class="img-fluid" width="50" height="50"></td>
+                    <td><img src="{{ employee.get_profile_picture_url }}" alt="Profile Picture" class="list-avatar"></td>
                     <td><a href="{% url 'employee_detail' employee.pk %}">{{ employee.name }}</a></td>
                     <td>{{ employee.surname }}</td>
                     <td>{{ employee.email }}</td>

@@ -177,3 +177,17 @@ def delete_note(request, note_id):
     note.delete()
     messages.success(request, "Note deleted successfully.")
     return redirect('employee_detail', pk=employee_id)
+
+@login_required
+def upload_profile_picture(request, pk):
+    employee = get_object_or_404(Employee, pk=pk)
+    if request.method == 'POST':
+        profile_picture = request.FILES.get('profile_picture')
+        if profile_picture:
+            employee.profile_picture = profile_picture.read()  # Store as binary data
+            employee.save()
+            messages.success(request, "Profile picture uploaded successfully.")
+        else:
+            messages.error(request, "No picture provided.")
+        return redirect('employee_detail', pk=pk)
+    return redirect('employee_detail', pk=pk)  # Fallback for GET requests
